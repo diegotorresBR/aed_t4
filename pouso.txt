@@ -1,0 +1,13 @@
+[P]{voo},  solicita pouso.
+[PE]{voo}, solicita  pouso imediato. Emergência a bordo.
+
+[RP_AG]{voo}, aguarde na fila de pouso.
+[RP_A]{voo}, pouso autorizado. 
+
+[C]Solo {cidade}, Bom dia, {voo}.
+[R_C]{voo}, Bom dia, prossiga.
+[D]Solo {cidade}, solicitou {voo} para {cidade_destino}, plano de vôo enviado.
+[RD_AG]{voo}, plano recebido, aguarde liberação.
+[RD_A]{voo}, autorizado {cidade_destino}
+[RD_A]{voo}, autorizado ingressar e alinhar na pista. Livre decolagem pista 18, 
+[RP_A], {voo}inicie descida para pista.
