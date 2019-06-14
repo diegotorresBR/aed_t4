@@ -11,6 +11,9 @@
 
 import random as r
 import fila as fila
+import time as tempo
+import threading as thread
+espera = 3 
 L_voos = []
 fila_pouso = fila.Fila()
 fila_pista = fila.Fila()
@@ -28,11 +31,11 @@ L_resp_dec_ag = []
 L_c = []
 L_resp_c = []
 
-for x in range(10):
+for x in range(1):
     L_voos.append(str(r.choice(compa_avioes)) + str(r.randint(1000, 9999)))
 
 
-arq = open("/home/admin/Documentos/pouso.txt", 'r').readlines()
+arq = open("/home/petmat/Documentos/aed1/aed_t4/pouso.txt", 'r').readlines()
 
 for x in arq:
     if("[P]" in x):
@@ -54,4 +57,43 @@ for x in arq:
     elif("[RD_A]" in x):
         L_resp_dec_a.append(x.replace("[RD_A]", ""))
 
-print(L_resp_dec_a)
+
+def decolar(voo):
+    print(f"--INICIANDO DECOLAGEM DO VOO {voo}--")
+    tempo.sleep(8)
+    print(f"--O VOO {voo} DECOLOU--")
+
+for x in L_voos:
+    #Iniciando a Comunicacao
+    cida = r.choice(l_cidade)
+    cida_destino = r.choice(l_cidade_destino)
+    n_voo = str(x)
+    texto_piloto = str(r.choice(L_c))
+    print(texto_piloto.format(cidade=cida, voo=n_voo))
+    tempo.sleep(espera)
+    texto_torre = str(r.choice(L_resp_c))
+    print(texto_torre.format(voo=n_voo))
+    tempo.sleep(espera)
+    #Solicitando
+    deco_ou_pousa = 0#r.randint(0,1)
+    if(deco_ou_pousa == 0): #Decola
+        texto_piloto = str(r.choice(L_dec_soli))
+        print(texto_piloto.format(cidade=cida, voo=n_voo, cidade_destino = cida_destino))
+    else:#pousa
+        texto_piloto = str(r.choice(L_pousos_soli))
+        print(texto_piloto.format(cidade=cida, voo=n_voo, cidade_destino = cida_destino))
+    
+    #respondendo
+    if(deco_ou_pousa == 0):#Decola
+        if(fila_pista.isEmpty()):
+            fila_pista.enfileirar(n_voo)
+            t = thread.Thread(target=decolar(n_voo))
+            t.start()
+            texto_torre = str(r.choice(L_resp_dec_a))
+            print(texto_torre.format(cidade=cida, voo=n_voo, cidade_destino = cida_destino))
+        else:
+            texto_torre = str(r.choice(L_resp_dec_ag))
+            print(texto_torre.format(cidade=cida, voo=n_voo, cidade_destino = cida_destino))
+        
+        
+
