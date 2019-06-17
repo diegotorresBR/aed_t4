@@ -13,7 +13,8 @@ import random as r
 import fila as fila
 import time as tempo
 import threading as thread
-espera = 3 
+espera = 3
+tempo_operacao = 4
 L_voos = []
 fila_pouso = fila.Fila()
 fila_pista = fila.Fila()
@@ -31,11 +32,11 @@ L_resp_dec_ag = []
 L_c = []
 L_resp_c = []
 
-for x in range(1):
+for x in range(4):
     L_voos.append(str(r.choice(compa_avioes)) + str(r.randint(1000, 9999)))
 
 
-arq = open("/home/petmat/Documentos/aed1/aed_t4/pouso.txt", 'r').readlines()
+arq = open("/home/diego/AEDTarefa/aed_t4/pouso.txt", 'r').readlines()
 
 for x in arq:
     if("[P]" in x):
@@ -58,10 +59,16 @@ for x in arq:
         L_resp_dec_a.append(x.replace("[RD_A]", ""))
 
 
-def decolar(voo):
-    print(f"--INICIANDO DECOLAGEM DO VOO {voo}--")
-    tempo.sleep(8)
-    print(f"--O VOO {voo} DECOLOU--")
+def decolar():
+    while(fila_pista.isEmpty() != True):
+        print("--PREPARANDO PARA DECOLAR.")
+        tempo.sleep(tempo_operacao)
+        print(f"--{fila_pista.desenfileirar()} DECOLOU.")
+def pousar():
+    while(fila_pouso.isEmpty() != True):
+        print("--PREPARANDO PARA POUSAR.")
+        tempo.sleep(tempo_operacao)
+        print(f"--{fila_pouso.desenfileirar()} POUSOU.")
 
 for x in L_voos:
     #Iniciando a Comunicacao
@@ -74,8 +81,13 @@ for x in L_voos:
     texto_torre = str(r.choice(L_resp_c))
     print(texto_torre.format(voo=n_voo))
     tempo.sleep(espera)
+
+    t = thread.Thread(target=decolar)
+    t2 = thread.Thread(target=pousar)
+
+
     #Solicitando
-    deco_ou_pousa = 0#r.randint(0,1)
+    deco_ou_pousa = r.randint(0,1)
     if(deco_ou_pousa == 0): #Decola
         texto_piloto = str(r.choice(L_dec_soli))
         print(texto_piloto.format(cidade=cida, voo=n_voo, cidade_destino = cida_destino))
@@ -85,15 +97,26 @@ for x in L_voos:
     
     #respondendo
     if(deco_ou_pousa == 0):#Decola
+        
         if(fila_pista.isEmpty()):
             fila_pista.enfileirar(n_voo)
-            t = thread.Thread(target=decolar(n_voo))
-            t.start()
             texto_torre = str(r.choice(L_resp_dec_a))
             print(texto_torre.format(cidade=cida, voo=n_voo, cidade_destino = cida_destino))
         else:
             texto_torre = str(r.choice(L_resp_dec_ag))
             print(texto_torre.format(cidade=cida, voo=n_voo, cidade_destino = cida_destino))
-        
-        
+            fila_pista.enfileirar(n_voo)
+    else:
+        t2 = thread.Thread(target=pousar)
+        if(fila_pouso.isEmpty()):
+            fila_pouso.enfileirar(n_voo)
+            texto_torre = str(r.choice(L_resp_p_a))
+            print(texto_torre.format(cidade=cida, voo=n_voo, cidade_destino = cida_destino))
+        else:
+            texto_torre = str(r.choice(L_resp_p_ag))
+            print(texto_torre.format(cidade=cida, voo=n_voo, cidade_destino = cida_destino))
+            fila_pouso.enfileirar(n_voo)
 
+    t.start()
+    t2.start()
+        
